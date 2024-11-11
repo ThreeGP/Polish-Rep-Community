@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PRC Spreadsheet</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        background: linear-gradient(
+          135deg,
+          #8b0000 0%,
+          #2b0000 50%,
+          #000000 100%
+        );
+        min-height: 100vh;
+        color: #fff;
+      }
+
+      header {
+        background-color: #000000;
+        color: #ff3333;
+        padding: 1rem;
+        border-bottom: 2px solid #ff3333;
+      }
+
+      nav {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 30px;
+      }
+
+      .logo {
+        height: 50px;
+        margin: 0 20px;
+        border-radius: 8px;
+        border: 2px solid #ff3333;
+      }
+
+      header a {
+        color: #ff3333;
+        text-decoration: none;
+        font-size: 1.2rem;
+        padding: 8px 16px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+      }
+
+      header a:hover {
+        color: #ff6666;
+        border-color: #ff3333;
+        background-color: rgba(139, 0, 0, 0.2);
+      }
+
+      .search-container {
+        padding: 20px;
+        background-color: rgba(0, 0, 0, 0.8);
+        box-shadow: 0 2px 5px rgba(139, 0, 0, 0.3);
+      }
+
+      #searchBox {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #8b0000;
+        border-radius: 4px;
+        background-color: #1a0000;
+        color: #fff;
+      }
+
+      #searchBox::placeholder {
+        color: #ff3333;
+        opacity: 0.7;
+      }
+
+      #itemContainer {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 0 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+      }
+
+      .item {
+        background-color: rgba(0, 0, 0, 0.9);
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(139, 0, 0, 0.3);
+        transition: transform 0.2s, box-shadow 0.2s;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #8b0000;
+      }
+
+      .item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3);
+      }
+
+      .item img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        border: 2px solid #8b0000;
+      }
+
+      .item h3 {
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+        color: #ff3333;
+      }
+
+      .item .price {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #ff6666;
+        margin-bottom: 8px;
+      }
+
+      .item .category {
+        font-size: 0.9rem;
+        color: #ff9999;
+        margin-bottom: 5px;
+      }
+
+      .item .batch {
+        font-size: 0.9rem;
+        color: #ff9999;
+        margin-bottom: 10px;
+      }
+
+      .item a {
+        text-decoration: none;
+        color: #fff;
+        background-color: #8b0000;
+        padding: 8px 15px;
+        border-radius: 4px;
+        text-align: center;
+        margin-top: auto;
+        transition: background-color 0.2s;
+      }
+
+      .item a:hover {
+        background-color: #ff3333;
+      }
+
+      .filter-controls {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .filter-controls select {
+        padding: 8px;
+        border: 1px solid #8b0000;
+        border-radius: 4px;
+        background-color: #1a0000;
+        color: #ff3333;
+        min-width: 150px;
+        cursor: pointer;
+      }
+
+      .filter-controls select:hover {
+        border-color: #ff3333;
+      }
+
+      .filter-controls select option {
+        background-color: #1a0000;
+        color: #ff3333;
+      }
+
+      /* Add smooth scrolling */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #1a0000;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: #8b0000;
+        border-radius: 5px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: #ff3333;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="#" id="linkNoverter">Link Converter</a>
+        <img src="prc.gif" alt="PRC" class="logo" />
+        <a href="https://discord.gg/your-discord-link" target="_blank"
+          >Discord</a
+        >
+      </nav>
+    </header>
+
+    <div class="search-container">
+      <input type="text" id="searchBox" placeholder="Search items..." />
+      <div class="filter-controls">
+        <select id="categoryFilter">
+          <option value="">All Categories</option>
+        </select>
+        <select id="batchFilter">
+          <option value="">All Batches</option>
+        </select>
+        <select id="priceSort">
+          <option value="">Sort by Price</option>
+          <option value="low">Lowest Price</option>
+          <option value="high">Highest Price</option>
+        </select>
+      </div>
+    </div>
+
+    <main id="itemContainer">
+      <!-- Example item template -->
+    </main>
+
+    <script>
+      let currentIndex = 0;
+      const itemsPerLoad = 8;
+      let filteredProducts = [];
+
+      async function loadProducts() {
+        try {
+          const response = await fetch("output.txt");
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          const products = await response.json();
+          window.allProducts = products;
+          filteredProducts = [...products];
+
+          // Initialize filter options
+          initializeFilters(products);
+
+          // Display initial items
+          displayNextItems(filteredProducts);
+
+          // Add scroll event listener
+          window.addEventListener("scroll", () => handleScroll());
+        } catch (error) {
+          console.error("Error loading the products:", error);
+          document.getElementById("itemContainer").innerHTML = `
+            <div class="item">
+              <h3>Error loading products</h3>
+              <p>Please try again later</p>
+            </div>
+          `;
+        }
+      }
+
+      function initializeFilters(products) {
+        // Get unique categories and batches
+        const categories = [...new Set(products.map((p) => p.category))].sort();
+        const batches = [...new Set(products.map((p) => p.batch))].sort();
+
+        // Populate category filter
+        const categorySelect = document.getElementById("categoryFilter");
+        categories.forEach((category) => {
+          const option = document.createElement("option");
+          option.value = category;
+          option.textContent = category;
+          categorySelect.appendChild(option);
+        });
+
+        // Populate batch filter
+        const batchSelect = document.getElementById("batchFilter");
+        batches.forEach((batch) => {
+          const option = document.createElement("option");
+          option.value = batch;
+          option.textContent = batch;
+          batchSelect.appendChild(option);
+        });
+      }
+
+      function applyFilters() {
+        const searchTerm = document
+          .getElementById("searchBox")
+          .value.toLowerCase();
+        const categoryFilter = document.getElementById("categoryFilter").value;
+        const batchFilter = document.getElementById("batchFilter").value;
+        const priceSort = document.getElementById("priceSort").value;
+
+        // Apply filters
+        filteredProducts = window.allProducts.filter((product) => {
+          const matchesSearch =
+            product.name.toLowerCase().includes(searchTerm) ||
+            product.category.toLowerCase().includes(searchTerm);
+          const matchesCategory =
+            !categoryFilter || product.category === categoryFilter;
+          const matchesBatch = !batchFilter || product.batch === batchFilter;
+
+          return matchesSearch && matchesCategory && matchesBatch;
+        });
+
+        // Apply price sorting
+        if (priceSort) {
+          filteredProducts.sort((a, b) => {
+            const priceA = parseFloat(a.price);
+            const priceB = parseFloat(b.price);
+            return priceSort === "low" ? priceA - priceB : priceB - priceA;
+          });
+        }
+
+        // Reset and display
+        currentIndex = 0;
+        displayNextItems();
+      }
+
+      function handleScroll() {
+        const { scrollTop, scrollHeight, clientHeight } =
+          document.documentElement;
+        if (scrollTop + clientHeight >= scrollHeight - 5) {
+          displayNextItems();
+        }
+      }
+
+      function displayNextItems() {
+        const container = document.getElementById("itemContainer");
+        const nextItems = filteredProducts.slice(
+          currentIndex,
+          currentIndex + itemsPerLoad
+        );
+
+        if (nextItems.length > 0) {
+          const newCards = nextItems
+            .map((product) => createProductCard(product))
+            .join("");
+
+          if (currentIndex === 0) {
+            container.innerHTML = newCards;
+          } else {
+            container.innerHTML += newCards;
+          }
+
+          currentIndex += itemsPerLoad;
+        }
+      }
+
+      function createProductCard(product) {
+        return `
+          <div class="item">
+            <img src="${product.image}" alt="${product.name}" onerror="this.src='placeholder.jpg'">
+            <h3>${product.name}</h3>
+            <div class="price">price: ${product.price} zł</div>
+            <div class="category">category: ${product.category}</div>
+            <div class="batch">batch: ${product.batch}</div>
+            <a href="${product.link}" target="_blank">View Product</a>
+          </div>
+        `;
+      }
+
+      // Event Listeners
+      document
+        .getElementById("searchBox")
+        .addEventListener("input", applyFilters);
+      document
+        .getElementById("categoryFilter")
+        .addEventListener("change", applyFilters);
+      document
+        .getElementById("batchFilter")
+        .addEventListener("change", applyFilters);
+      document
+        .getElementById("priceSort")
+        .addEventListener("change", applyFilters);
+
+      document
+        .getElementById("linkNoverter")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          console.log("Link Noverter clicked");
+        });
+
+      // Load products when page loads
+      window.onload = loadProducts;
+    </script>
+  </body>
+</html>
