@@ -15,4 +15,4 @@ This application is a simple web page featuring infinite scrolling, search funct
 
 This project is a demonstration of AI-assisted development.
 
-Showcase: https://threegp.github.io/prc/ 
+[SHOWCASE](https://threegp.github.io/Polish-Rep-Community/)
