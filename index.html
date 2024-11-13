@@ -203,6 +203,39 @@
       ::-webkit-scrollbar-thumb:hover {
         background: #ff3333;
       }
+
+      .button-container {
+        display: flex;
+        gap: 10px;
+        margin-top: auto;
+      }
+
+      .cnfans-btn,
+      .kakobuy-btn {
+        text-decoration: none;
+        color: #fff;
+        padding: 8px 15px;
+        border-radius: 4px;
+        text-align: center;
+        flex: 1;
+        transition: all 0.3s ease;
+      }
+
+      .cnfans-btn {
+        background-color: #8b0000;
+      }
+
+      .kakobuy-btn {
+        background-color: #4a0000;
+      }
+
+      .cnfans-btn:hover {
+        background-color: #ff3333;
+      }
+
+      .kakobuy-btn:hover {
+        background-color: #cc0000;
+      }
     </style>
   </head>
   <body>
@@ -210,7 +243,7 @@
       <nav>
         <a href="#" id="linkNoverter">Link Converter</a>
         <img src="prc.gif" alt="PRC" class="logo" />
-        <a href="https://discord.gg/polish-rep-community-1109008676544593970" target="_blank"
+        <a href="https://discord.gg/your-discord-link" target="_blank"
           >Discord</a
         >
       </nav>
@@ -359,7 +392,38 @@
         }
       }
 
+      // Add this new function for link conversion
+      function convertLink(cnfansLink) {
+        try {
+          const url = new URL(cnfansLink);
+          const itemId = url.searchParams.get("id");
+          const shopType = url.searchParams.get("shop_type");
+
+          if (!itemId) {
+            throw new Error("No ID in input link");
+          }
+
+          let sourceUrl;
+          if (shopType === "weidian") {
+            sourceUrl = `https://weidian.com/item.html?itemID=${itemId}`;
+          } else if (shopType === "ali_1688") {
+            sourceUrl = `https://detail.1688.com/offer/${itemId}.html`;
+          } else if (shopType === "taobao") {
+            sourceUrl = `https://item.taobao.com/item.htm?id=${itemId}`;
+          } else {
+            throw new Error("Unsupported shop type");
+          }
+
+          const encodedUrl = encodeURIComponent(sourceUrl);
+          return `https://www.kakobuy.com/item/details?url=${encodedUrl}`;
+        } catch (error) {
+          console.error("Error converting link:", error);
+          return null;
+        }
+      }
+
       function createProductCard(product) {
+        const kakobuyLink = convertLink(product.link);
         return `
           <div class="item">
             <img src="${product.image}" alt="${product.name}" onerror="this.src='placeholder.jpg'">
@@ -367,7 +431,10 @@
             <div class="price">price: ${product.price} zł</div>
             <div class="category">category: ${product.category}</div>
             <div class="batch">batch: ${product.batch}</div>
-            <a href="${product.link}" target="_blank">View Product</a>
+            <div class="button-container">
+              <a href="${product.link}" target="_blank" class="cnfans-btn">CNFans</a>
+              <a href="${kakobuyLink}" target="_blank" class="kakobuy-btn">KakoBuy</a>
+            </div>
           </div>
         `;
       }
