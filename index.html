@@ -255,6 +255,93 @@
       .banner-image:hover {
         transform: scale(1.02);
       }
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+      }
+
+      .modal-content {
+        background-color: #1a0000;
+        margin: 15% auto;
+        padding: 20px;
+        border: 2px solid #8b0000;
+        border-radius: 8px;
+        width: 80%;
+        max-width: 600px;
+        position: relative;
+      }
+
+      .close {
+        color: #ff3333;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .close:hover {
+        color: #ff6666;
+      }
+
+      .converter-container {
+        margin-top: 20px;
+      }
+
+      .converter-container input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color: #000;
+        border: 1px solid #8b0000;
+        border-radius: 4px;
+        color: #fff;
+      }
+
+      .converter-container button {
+        background-color: #8b0000;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+
+      .converter-container button:hover {
+        background-color: #ff3333;
+      }
+
+      #result {
+        margin-top: 20px;
+        display: none;
+      }
+
+      #result.show {
+        display: flex;
+        gap: 10px;
+      }
+
+      .allchinabuy-btn {
+        text-decoration: none;
+        color: #fff;
+        padding: 8px 15px;
+        border-radius: 4px;
+        text-align: center;
+        flex: 1;
+        transition: all 0.3s ease;
+        background-color: #2b0000;
+      }
+
+      .allchinabuy-btn:hover {
+        background-color: #990000;
+      }
     </style>
   </head>
   <body>
@@ -267,6 +354,25 @@
         >
       </nav>
     </header>
+
+    <div id="linkConverterModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Link Converter</h2>
+        <div class="converter-container">
+          <input
+            type="text"
+            id="cnfansLink"
+            placeholder="Paste CNFans link here..."
+          />
+          <button id="convertButton">Convert</button>
+          <div id="result">
+            <input type="text" id="kakoLink" readonly />
+            <button id="copyButton">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="search-container">
       <input type="text" id="searchBox" placeholder="Search items..." />
@@ -416,7 +522,7 @@
         }
       }
 
-      // Add this new function for link conversion
+      // Update the convertLink function
       function convertLink(cnfansLink) {
         try {
           const url = new URL(cnfansLink);
@@ -438,16 +544,27 @@
             throw new Error("Unsupported shop type");
           }
 
+          // Create both KakoBuy and AllChinaBuy links
           const encodedUrl = encodeURIComponent(sourceUrl);
-          return `https://www.kakobuy.com/item/details?url=${encodedUrl}`;
+          const kakobuyLink = `https://www.kakobuy.com/item/details?url=${encodedUrl}`;
+          const allchinabuyLink = `https://www.allchinabuy.com/en/page/buy/?nTag=Home-search&from=search-input&_search=url&position=&url=${encodedUrl}`;
+
+          return {
+            kakobuy: kakobuyLink,
+            allchinabuy: allchinabuyLink,
+          };
         } catch (error) {
           console.error("Error converting link:", error);
           return null;
         }
       }
 
+      // Update the createProductCard function
       function createProductCard(product) {
-        const kakobuyLink = convertLink(product.link);
+        const links = convertLink(product.link);
+        const kakobuyLink = links ? links.kakobuy : "#";
+        const allchinabuyLink = links ? links.allchinabuy : "#";
+
         return `
           <div class="item">
             <img src="${product.image}" alt="${product.name}" onerror="this.src='placeholder.jpg'">
@@ -458,6 +575,7 @@
             <div class="button-container">
               <a href="${product.link}" target="_blank" class="cnfans-btn">CNFans</a>
               <a href="${kakobuyLink}" target="_blank" class="kakobuy-btn">KakoBuy</a>
+              <a href="${allchinabuyLink}" target="_blank" class="allchinabuy-btn">AllChinaBuy</a>
             </div>
           </div>
         `;
@@ -486,6 +604,69 @@
 
       // Load products when page loads
       window.onload = loadProducts;
+
+      // Link converter modal functionality
+      const modal = document.getElementById("linkConverterModal");
+      const linkConverterBtn = document.getElementById("linkNoverter");
+      const closeBtn = document.getElementsByClassName("close")[0];
+      const convertBtn = document.getElementById("convertButton");
+      const copyBtn = document.getElementById("copyButton");
+      const resultDiv = document.getElementById("result");
+
+      linkConverterBtn.onclick = function (e) {
+        e.preventDefault();
+        modal.style.display = "block";
+      };
+
+      closeBtn.onclick = function () {
+        modal.style.display = "none";
+      };
+
+      window.onclick = function (event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      };
+
+      // Update the converter modal result handling
+      convertBtn.onclick = function () {
+        const cnfansLink = document.getElementById("cnfansLink").value;
+        const links = convertLink(cnfansLink);
+
+        if (links) {
+          const resultHTML = `
+            <div>
+              <label>KakoBuy:</label>
+              <input type="text" id="kakoLink" value="${links.kakobuy}" readonly>
+              <button onclick="copyToClipboard('kakoLink')">Copy</button>
+            </div>
+            <div>
+              <label>AllChinaBuy:</label>
+              <input type="text" id="allchinaLink" value="${links.allchinabuy}" readonly>
+              <button onclick="copyToClipboard('allchinaLink')">Copy</button>
+            </div>
+          `;
+          resultDiv.innerHTML = resultHTML;
+          resultDiv.classList.add("show");
+        } else {
+          alert("Invalid link format. Please check your input.");
+        }
+      };
+
+      // Add this helper function for copying
+      function copyToClipboard(elementId) {
+        const element = document.getElementById(elementId);
+        element.select();
+        document.execCommand("copy");
+
+        // Visual feedback
+        const button = element.nextElementSibling;
+        const originalText = button.textContent;
+        button.textContent = "Copied!";
+        setTimeout(() => {
+          button.textContent = originalText;
+        }, 2000);
+      }
     </script>
   </body>
 </html>
