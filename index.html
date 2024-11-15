@@ -327,21 +327,6 @@
         display: flex;
         gap: 10px;
       }
-
-      .allchinabuy-btn {
-        text-decoration: none;
-        color: #fff;
-        padding: 8px 15px;
-        border-radius: 4px;
-        text-align: center;
-        flex: 1;
-        transition: all 0.3s ease;
-        background-color: #2b0000;
-      }
-
-      .allchinabuy-btn:hover {
-        background-color: #990000;
-      }
     </style>
   </head>
   <body>
@@ -544,15 +529,8 @@
             throw new Error("Unsupported shop type");
           }
 
-          // Create both KakoBuy and AllChinaBuy links
           const encodedUrl = encodeURIComponent(sourceUrl);
-          const kakobuyLink = `https://www.kakobuy.com/item/details?url=${encodedUrl}`;
-          const allchinabuyLink = `https://www.allchinabuy.com/en/page/buy/?nTag=Home-search&from=search-input&_search=url&position=&url=${encodedUrl}`;
-
-          return {
-            kakobuy: kakobuyLink,
-            allchinabuy: allchinabuyLink,
-          };
+          return `https://www.kakobuy.com/item/details?url=${encodedUrl}`;
         } catch (error) {
           console.error("Error converting link:", error);
           return null;
@@ -561,10 +539,7 @@
 
       // Update the createProductCard function
       function createProductCard(product) {
-        const links = convertLink(product.link);
-        const kakobuyLink = links ? links.kakobuy : "#";
-        const allchinabuyLink = links ? links.allchinabuy : "#";
-
+        const kakobuyLink = convertLink(product.link);
         return `
           <div class="item">
             <img src="${product.image}" alt="${product.name}" onerror="this.src='placeholder.jpg'">
@@ -575,7 +550,6 @@
             <div class="button-container">
               <a href="${product.link}" target="_blank" class="cnfans-btn">CNFans</a>
               <a href="${kakobuyLink}" target="_blank" class="kakobuy-btn">KakoBuy</a>
-              <a href="${allchinabuyLink}" target="_blank" class="allchinabuy-btn">AllChinaBuy</a>
             </div>
           </div>
         `;
@@ -631,22 +605,10 @@
       // Update the converter modal result handling
       convertBtn.onclick = function () {
         const cnfansLink = document.getElementById("cnfansLink").value;
-        const links = convertLink(cnfansLink);
+        const kakoLink = convertLink(cnfansLink);
 
-        if (links) {
-          const resultHTML = `
-            <div>
-              <label>KakoBuy:</label>
-              <input type="text" id="kakoLink" value="${links.kakobuy}" readonly>
-              <button onclick="copyToClipboard('kakoLink')">Copy</button>
-            </div>
-            <div>
-              <label>AllChinaBuy:</label>
-              <input type="text" id="allchinaLink" value="${links.allchinabuy}" readonly>
-              <button onclick="copyToClipboard('allchinaLink')">Copy</button>
-            </div>
-          `;
-          resultDiv.innerHTML = resultHTML;
+        if (kakoLink) {
+          document.getElementById("kakoLink").value = kakoLink;
           resultDiv.classList.add("show");
         } else {
           alert("Invalid link format. Please check your input.");
