@@ -23,7 +23,6 @@
         min-height: 100vh;
         color: #fff;
       }
-
       header {
         background-color: #000000;
         color: #ff3333;
@@ -236,6 +235,26 @@
       .kakobuy-btn:hover {
         background-color: #cc0000;
       }
+      .banner-container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 0 20px;
+        text-align: center;
+      }
+
+      .banner-image {
+        width: 100%;
+        max-height: 200px;
+        object-fit: contain;
+        border-radius: 8px;
+        border: 2px solid #8b0000;
+        transition: transform 0.2s;
+      }
+
+      .banner-image:hover {
+        transform: scale(1.02);
+      }
     </style>
   </head>
   <body>
@@ -264,6 +283,11 @@
           <option value="high">Highest Price</option>
         </select>
       </div>
+    </div>
+    <div class="banner-container">
+      <a href="https://ikako.vip/r/plrepcom" target="_blank">
+        <img src="standard.gif" alt="Banner" class="banner-image" />
+      </a>
     </div>
 
     <main id="itemContainer">
